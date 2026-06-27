@@ -49,7 +49,8 @@ type peerRESTClient struct {
 	gridConn func() *grid.Connection
 }
 
-// Returns a peer rest client.
+// Returns a peer rest client. The client uses HTTPS when TLS is
+// enabled globally and otherwise falls back to plain HTTP.
 func newPeerRESTClient(peer *xnet.Host, gridHost string) *peerRESTClient {
 	scheme := "http"
 	if globalIsTLS {
