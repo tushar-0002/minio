@@ -80,7 +80,8 @@ func init() {
 }
 
 // isValidVolname verifies a volname name in accordance with object
-// layer requirements.
+// layer requirements. Volume names shorter than 3 characters are
+// rejected, and on Windows reserved characters are disallowed.
 func isValidVolname(volname string) bool {
 	if len(volname) < 3 {
 		return false
