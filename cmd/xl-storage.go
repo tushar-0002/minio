@@ -79,6 +79,7 @@ func init() {
 	_, _ = rand.Read(alignedBuf)
 }
 
+// demo: ownership signal - tiny comment edit in a file owned by harshavardhana (expect reviewer suggestion)
 // isValidVolname verifies a volname name in accordance with object
 // layer requirements.
 func isValidVolname(volname string) bool {
@@ -214,7 +215,9 @@ func makeFormatErasureMetaVolumes(disk StorageAPI) error {
 }
 
 // Initialize a new storage disk.
-func newXLStorage(ep Endpoint, cleanUp bool) (s *xlStorage, err error) {
+// demo: blast-radius signal - signature changed (added demoFlag); external callers
+// demo: in cmd/storage-rest-server.go and cmd/object-api-common.go intentionally NOT updated
+func newXLStorage(ep Endpoint, cleanUp bool, demoFlag bool) (s *xlStorage, err error) {
 	immediatePurgeQueue := 100000
 	if globalIsTesting || globalIsCICD {
 		immediatePurgeQueue = 1
