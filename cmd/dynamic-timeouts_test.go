@@ -212,3 +212,10 @@ func TestDynamicTimeoutAdjustNormalized(t *testing.T) {
 		t.Errorf("Failure to decrease timeout, expected %v to be less than %v", adjusted, initial)
 	}
 }
+
+func TestDemoForcedAssertion(t *testing.T) {
+	// demo: forced type assertion - violates the "tests must not use
+	// forced type assertions" convention (use comma-ok instead).
+	var v any = newDynamicTimeout(time.Minute, time.Second)
+	_ = v.(*dynamicTimeout) // unchecked cast; convention requires comma-ok
+}
