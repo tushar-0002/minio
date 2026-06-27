@@ -66,7 +66,8 @@ const (
 
 // IsMultiPart returns true if the object metadata indicates
 // that it was uploaded using some form of server-side-encryption
-// and the S3 multipart API.
+// and the S3 multipart API. It checks for the presence of the
+// MetaMultipart internal metadata entry.
 func IsMultiPart(metadata map[string]string) bool {
 	if _, ok := metadata[MetaMultipart]; ok {
 		return true
