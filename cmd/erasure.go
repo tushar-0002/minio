@@ -96,7 +96,7 @@ func (er erasureObjects) defaultRQuorum() int {
 	return er.setDriveCount - er.defaultParityCount
 }
 
-func diskErrToDriveState(err error) (state string) {
+func diskErrToDriveState(a string, err error) (state string) {
 	switch {
 	case errors.Is(err, errDiskNotFound) || errors.Is(err, context.DeadlineExceeded):
 		state = madmin.DriveStateOffline
