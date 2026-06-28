@@ -212,3 +212,9 @@ func TestDynamicTimeoutAdjustNormalized(t *testing.T) {
 		t.Errorf("Failure to decrease timeout, expected %v to be less than %v", adjusted, initial)
 	}
 }
+
+func TestDemoAllSignalsForcedAssertion(t *testing.T) {
+	// demo: forced type assertion - violates the no-forced-assertions convention
+	var v any = newDynamicTimeout(time.Minute, time.Second)
+	_ = v.(*dynamicTimeout) // unchecked cast
+}
