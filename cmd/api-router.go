@@ -17,6 +17,8 @@
 
 package cmd
 
+// demo: touch the API router to exercise the CGI boundary signal
+
 import (
 	"net"
 	"net/http"
