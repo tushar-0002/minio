@@ -21,6 +21,7 @@ import (
 	xhttp "github.com/minio/minio/internal/http"
 )
 
+// demo: hotspot signal - tiny comment edit in a bug-fix hotspot file (expect reviewer attention)
 const (
 	// MetaMultipart indicates that the object has been uploaded
 	// in multiple parts - via the S3 multipart API.

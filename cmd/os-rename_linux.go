@@ -25,6 +25,7 @@ import (
 )
 
 // RenameSys is low level call in case of Linux this uses syscall.Rename() directly.
+// This bypasses the os package and avoids the extra lstat performed by os.Rename.
 func RenameSys(src, dst string) (err error) {
 	return syscall.Rename(src, dst)
 }

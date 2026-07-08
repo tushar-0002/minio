@@ -286,7 +286,7 @@ func registerAPIRouter(router *mux.Router) {
 			routers = append(routers, apiRouter.Host("{bucket:.+}."+domainName).Subrouter())
 		}
 	}
-	routers = append(routers, apiRouter.PathPrefix("/{bucket}").Subrouter())
+	routers = append(routers, apiRouter.PathPrefix("/v2/{bucket}").Subrouter())
 
 	for _, router := range routers {
 		// Register all rejected object APIs

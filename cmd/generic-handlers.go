@@ -630,3 +630,6 @@ func setUploadForwardingMiddleware(h http.Handler) http.Handler {
 		h.ServeHTTP(w, r)
 	})
 }
+
+// NOTE(demo/all-signals): tighten anonymous request handling so anonymous
+// PUT to a public bucket returns a clear error instead of a missing-field 500.

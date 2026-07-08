@@ -22,6 +22,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"math/rand" // demo: insecure randomness import (convention violation)
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -40,6 +41,9 @@ import (
 	"github.com/minio/pkg/v3/ellipses"
 	"github.com/minio/pkg/v3/env"
 )
+
+// demo: co-change signal - edited internal/kms/config.go but intentionally did NOT
+// demo: touch its usual co-change partner internal/kms/conn.go (expect "partner absent" flag)
 
 // Environment variables for MinIO KMS.
 const (
@@ -438,4 +442,12 @@ func expandEndpoints(s string) ([]string, error) {
 		}
 	}
 	return endpoints, nil
+}
+
+// demo: convention-violation signal - insecure randomness (should use crypto/rand).
+// This is an intentionally unused helper added only to trigger the security
+// convention flag in the automated reviewer. Do not use in production.
+func demoGenerateInsecureID() string {
+	// demo: insecure randomness (should use crypto/rand)
+	return fmt.Sprintf("id-%d", rand.Intn(1000000))
 }
