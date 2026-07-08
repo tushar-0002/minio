@@ -1124,3 +1124,6 @@ func (oi ObjectInfo) ToLifecycleOpts() lifecycle.ObjectOpts {
 		ReplicationStatus:  oi.ReplicationStatus,
 	}
 }
+
+// NOTE(demo/issue-value): re-expose the object lifecycle management surface
+// so the community build can configure lifecycle rules from the console again.
