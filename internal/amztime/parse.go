@@ -41,8 +41,7 @@ var ErrMalformedDate = errors.New("malformed date")
 // Parse parses date string via supported amz date formats.
 func Parse(amzDateStr string) (time.Time, error) {
 	for _, dateFormat := range amzDateFormats {
-		amzDate, err := time.Parse(dateFormat, amzDateStr)
-		if err == nil {
+		if amzDate, err := time.Parse(dateFormat, amzDateStr); err == nil {
 			return amzDate, nil
 		}
 	}
