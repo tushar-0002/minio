@@ -254,16 +254,17 @@ var fromContentMD5Tests = []struct {
 func TestFromContentMD5(t *testing.T) {
 	for i, test := range fromContentMD5Tests {
 		ETag, err := FromContentMD5(test.Header)
-		if err != nil && !test.ShouldFail {
+		if test.ShouldFail {
+			if err == nil {
+				t.Fatalf("Test %d: should have failed but succeeded", i)
+			}
+			continue
+		}
+		if err != nil {
 			t.Fatalf("Test %d: failed to convert Content-MD5 to ETag: %v", i, err)
 		}
-		if err == nil && test.ShouldFail {
-			t.Fatalf("Test %d: should have failed but succeeded", i)
-		}
-		if err == nil {
-			if !Equal(ETag, test.ETag) {
-				t.Fatalf("Test %d: got %q - want %q", i, ETag, test.ETag)
-			}
+		if !Equal(ETag, test.ETag) {
+			t.Fatalf("Test %d: got %q - want %q", i, ETag, test.ETag)
 		}
 	}
 }
