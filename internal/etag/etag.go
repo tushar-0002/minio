@@ -255,7 +255,7 @@ func FromContentMD5(h http.Header) (ETag, error) {
 	}
 	b, err := base64.StdEncoding.Strict().DecodeString(v[0])
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("etag: content-md5 is not valid base64: %w", err)
 	}
 	if len(b) != md5.Size {
 		return nil, errors.New("etag: invalid content-md5")
