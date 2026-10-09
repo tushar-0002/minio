@@ -60,8 +60,8 @@ COPY --from=build /go/bin/minio* /usr/bin/
 COPY --from=build /go/bin/mc* /usr/bin/
 COPY --from=build /go/bin/cur* /usr/bin/
 
-COPY CREDITS /licenses/CREDITS
-COPY LICENSE /licenses/LICENSE
+COPY CREDITS /usr/share/licenses/minio/CREDITS
+COPY LICENSE /usr/share/licenses/minio/LICENSE
 COPY dockerscripts/docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
 
 EXPOSE 9000
