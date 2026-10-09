@@ -598,15 +598,6 @@ func errEvaluatorInvalidTimestampFormatPatternSymbol(err error) *s3Error {
 //	Generic S3 HTTP handler errors.
 //
 // //////////////////////////////////////////////////////////////////////
-func errBusy(err error) *s3Error {
-	return &s3Error{
-		code:       "Busy",
-		message:    "The service is unavailable. Please retry.",
-		statusCode: 503,
-		cause:      err,
-	}
-}
-
 func errUnauthorizedAccess(err error) *s3Error {
 	return &s3Error{
 		code:       "UnauthorizedAccess",
