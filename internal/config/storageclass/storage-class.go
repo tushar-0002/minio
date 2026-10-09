@@ -68,7 +68,7 @@ const (
 	minParityDrives = 0
 
 	// Default RRS parity is always minimum parity.
-	defaultRRSParity = 1
+	defaultRRSParity = 2
 )
 
 // DefaultKVS - default storage class config
