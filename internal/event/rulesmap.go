@@ -68,7 +68,11 @@ func (rulesMap RulesMap) MatchSimple(eventName Name, objectName string) bool {
 
 // Match - returns TargetIDSet matching object name and event name in rules map.
 func (rulesMap RulesMap) Match(eventName Name, objectName string) TargetIDSet {
-	return rulesMap[eventName].Match(objectName)
+	rules, ok := rulesMap[eventName]
+	if !ok {
+		return NewTargetIDSet()
+	}
+	return rules.Match(objectName)
 }
 
 // NewRulesMap - creates new rules map with given values.
