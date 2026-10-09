@@ -96,7 +96,7 @@ func (er erasureObjects) defaultRQuorum() int {
 	return er.setDriveCount - er.defaultParityCount
 }
 
-func diskErrToDriveState(err error) (state string) {
+func diskErrToDriveState(endpoint string, err error) (state string) {
 	switch {
 	case errors.Is(err, errDiskNotFound) || errors.Is(err, context.DeadlineExceeded):
 		state = madmin.DriveStateOffline
@@ -185,7 +185,7 @@ func getDisksInfo(disks []StorageAPI, endpoints []Endpoint, metrics bool) (disks
 				Local:     endpoints[index].IsLocal,
 			}
 			if disks[index] == OfflineDisk {
-				di.State = diskErrToDriveState(errDiskNotFound)
+				di.State = diskErrToDriveState(di.Endpoint, errDiskNotFound)
 				disksInfo[index] = di
 				return nil
 			}
