@@ -228,10 +228,11 @@ func (c *StandardClaims) SetAccessKey(accessKey string) {
 // Valid - implements https://godoc.org/github.com/golang-jwt/jwt#Claims compatible
 // claims interface, additionally validates "accessKey" fields.
 func (c *StandardClaims) Valid() error {
-	if err := c.StandardClaims.Valid(); err != nil {
-		return err
-	}
+	return c.validIdentity()
+}
 
+// validIdentity checks that the token names an access key.
+func (c *StandardClaims) validIdentity() error {
 	if c.AccessKey == "" && c.Subject == "" {
 		return jwtgo.NewValidationError("accessKey/sub missing",
 			jwtgo.ValidationErrorClaimsInvalid)
@@ -355,11 +356,6 @@ func ParseWithStandardClaims(tokenStr string, claims *StandardClaims, key []byte
 		return jwtgo.ErrSignatureInvalid
 	}
 	borrow.ReturnAll()
-
-	if claims.AccessKey == "" && claims.Subject == "" {
-		return jwtgo.NewValidationError("accessKey/sub missing",
-			jwtgo.ValidationErrorClaimsInvalid)
-	}
 
 	// Signature is valid, lets validate the claims for
 	// other fields such as expiry etc.
