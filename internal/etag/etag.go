@@ -118,7 +118,6 @@ import (
 	"strings"
 
 	"github.com/minio/minio/internal/hash/sha256"
-	xhttp "github.com/minio/minio/internal/http"
 	"github.com/minio/sio"
 )
 
@@ -261,12 +260,6 @@ func FromContentMD5(h http.Header) (ETag, error) {
 		return nil, errors.New("etag: invalid content-md5")
 	}
 	return ETag(b), nil
-}
-
-// ContentMD5Requested - for http.request.header is not request Content-Md5
-func ContentMD5Requested(h http.Header) bool {
-	_, ok := h[xhttp.ContentMD5]
-	return ok
 }
 
 // Multipart computes an S3 multipart ETag given a list of
