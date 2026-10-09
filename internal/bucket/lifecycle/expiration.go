@@ -52,7 +52,7 @@ func (eDays *ExpirationDays) UnmarshalXML(d *xml.Decoder, startElement xml.Start
 // MarshalXML encodes number of days to expire if it is non-zero and
 // encodes empty string otherwise
 func (eDays ExpirationDays) MarshalXML(e *xml.Encoder, startElement xml.StartElement) error {
-	if eDays == 0 {
+	if eDays == ExpirationDays(0) {
 		return nil
 	}
 	return e.EncodeElement(int(eDays), startElement)
@@ -79,15 +79,18 @@ func (eDate *ExpirationDate) UnmarshalXML(d *xml.Decoder, startElement xml.Start
 		return errLifecycleInvalidDate
 	}
 	// Allow only date timestamp specifying midnight GMT
-	hr, m, sec := expDate.Clock()
-	nsec := expDate.Nanosecond()
-	loc := expDate.Location()
-	if hr != 0 || m != 0 || sec != 0 || nsec != 0 || loc.String() != time.UTC.String() {
+	if !isMidnightUTC(expDate) {
 		return errLifecycleDateNotMidnight
 	}
 
 	*eDate = ExpirationDate{expDate}
 	return nil
+}
+
+// isMidnightUTC returns true if t is exactly midnight in UTC
+func isMidnightUTC(t time.Time) bool {
+	hr, m, sec := t.Clock()
+	return hr == 0 && m == 0 && sec == 0 && t.Nanosecond() == 0 && t.Location().String() == time.UTC.String()
 }
 
 // MarshalXML encodes expiration date if it is non-zero and encodes
@@ -188,7 +191,7 @@ func (e Expiration) Validate() error {
 	}
 
 	// DeleteAll set without expiration days
-	if e.DeleteAll.set && e.IsDaysNull() {
+	if e.IsDaysNull() && e.DeleteAll.set {
 		return errLifecycleInvalidDeleteAll
 	}
 
