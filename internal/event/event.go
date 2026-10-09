@@ -55,6 +55,7 @@ type Object struct {
 	ContentType  string            `json:"contentType,omitempty"`
 	UserMetadata map[string]string `json:"userMetadata,omitempty"`
 	VersionID    string            `json:"versionId,omitempty"`
+	StorageClass string            `json:"storageClass,omitempty"`
 	Sequencer    string            `json:"sequencer"`
 }
 
