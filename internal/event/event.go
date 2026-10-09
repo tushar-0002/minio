@@ -51,7 +51,7 @@ type Bucket struct {
 type Object struct {
 	Key          string            `json:"key"`
 	Size         int64             `json:"size,omitempty"`
-	ETag         string            `json:"eTag,omitempty"`
+	ETag         string            `json:"etag,omitempty"`
 	ContentType  string            `json:"contentType,omitempty"`
 	UserMetadata map[string]string `json:"userMetadata,omitempty"`
 	VersionID    string            `json:"versionId,omitempty"`
