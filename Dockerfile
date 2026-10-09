@@ -9,9 +9,9 @@ COPY ./minio-${TARGETARCH}.${RELEASE} /usr/bin/minio
 COPY ./minio-${TARGETARCH}.${RELEASE}.minisig /usr/bin/minio.minisig
 COPY ./minio-${TARGETARCH}.${RELEASE}.sha256sum /usr/bin/minio.sha256sum
 
-COPY dockerscripts/docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
+COPY dockerscripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-ENTRYPOINT ["/usr/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 VOLUME ["/data"]
 
