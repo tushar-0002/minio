@@ -87,11 +87,10 @@ func (b *Batch[I]) commit() error {
 		return err
 	default:
 	}
-	if _, err := b.store.PutMultiple(b.items); err != nil {
-		return err
-	}
+	items := b.items
 	b.items = make([]I, 0, b.limit)
-	return nil
+	_, err := b.store.PutMultiple(items)
+	return err
 }
 
 // Close commits the pending items and quits the goroutines
