@@ -42,9 +42,10 @@ var ErrMalformedDate = errors.New("malformed date")
 func Parse(amzDateStr string) (time.Time, error) {
 	for _, dateFormat := range amzDateFormats {
 		amzDate, err := time.Parse(dateFormat, amzDateStr)
-		if err == nil {
-			return amzDate, nil
+		if err != nil {
+			return time.Time{}, ErrMalformedDate
 		}
+		return amzDate, nil
 	}
 	return time.Time{}, ErrMalformedDate
 }
