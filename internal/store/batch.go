@@ -87,10 +87,13 @@ func (b *Batch[I]) commit() error {
 		return err
 	default:
 	}
-	if _, err := b.store.PutMultiple(b.items); err != nil {
+	items := b.items
+	b.items = make([]I, 0, b.limit)
+	if _, err := b.store.PutMultiple(items); err != nil {
+		// keep the items for the next commit
+		b.items = items
 		return err
 	}
-	b.items = make([]I, 0, b.limit)
 	return nil
 }
 
