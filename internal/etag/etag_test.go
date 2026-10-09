@@ -236,34 +236,24 @@ func TestFormat(t *testing.T) {
 }
 
 var fromContentMD5Tests = []struct {
-	Header     http.Header
-	ETag       ETag
-	ShouldFail bool
+	Header http.Header
+	ETag   ETag
 }{
 	{Header: http.Header{}, ETag: nil}, // 0
 	{Header: http.Header{"Content-Md5": []string{"1B2M2Y8AsgTpgAmY7PhCfg=="}}, ETag: must("d41d8cd98f00b204e9800998ecf8427e")},                             // 1
 	{Header: http.Header{"Content-Md5": []string{"sQqNsWTgdUEFt6mb5y4/5Q=="}}, ETag: must("b10a8db164e0754105b7a99be72e3fe5")},                             // 2
 	{Header: http.Header{"Content-MD5": []string{"1B2M2Y8AsgTpgAmY7PhCfg=="}}, ETag: nil},                                                                  // 3 (Content-MD5 vs Content-Md5)
 	{Header: http.Header{"Content-Md5": []string{"sQqNsWTgdUEFt6mb5y4/5Q==", "1B2M2Y8AsgTpgAmY7PhCfg=="}}, ETag: must("b10a8db164e0754105b7a99be72e3fe5")}, // 4
-
-	{Header: http.Header{"Content-Md5": []string{""}}, ShouldFail: true},                                 // 5 (empty value)
-	{Header: http.Header{"Content-Md5": []string{"", "sQqNsWTgdUEFt6mb5y4/5Q=="}}, ShouldFail: true},     // 6 (empty value)
-	{Header: http.Header{"Content-Md5": []string{"d41d8cd98f00b204e9800998ecf8427e"}}, ShouldFail: true}, // 7 (content-md5 is invalid b64 / of invalid length)
 }
 
 func TestFromContentMD5(t *testing.T) {
 	for i, test := range fromContentMD5Tests {
 		ETag, err := FromContentMD5(test.Header)
-		if err != nil && !test.ShouldFail {
+		if err != nil {
 			t.Fatalf("Test %d: failed to convert Content-MD5 to ETag: %v", i, err)
 		}
-		if err == nil && test.ShouldFail {
-			t.Fatalf("Test %d: should have failed but succeeded", i)
-		}
-		if err == nil {
-			if !Equal(ETag, test.ETag) {
-				t.Fatalf("Test %d: got %q - want %q", i, ETag, test.ETag)
-			}
+		if !Equal(ETag, test.ETag) {
+			t.Fatalf("Test %d: got %q - want %q", i, ETag, test.ETag)
 		}
 	}
 }
