@@ -148,6 +148,7 @@ odirect                         (boolean)   set to enable or disable O_DIRECT fo
 root_access                     (boolean)   turn 'off' root credential access for all API calls including s3, admin operations (default: 'on')
 sync_events                     (boolean)   set to enable synchronous bucket notifications (default: 'off')
 object_max_versions             (number)    set max allowed number of versions per object (default: '9223372036854775807')
+presign_max_expiry              (duration)  set the longest expiry allowed for presigned URLs (default: '168h')
 ```
 
 or environment variables
