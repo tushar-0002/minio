@@ -116,5 +116,11 @@ var (
 			Optional:    true,
 			Type:        "number",
 		},
+		config.HelpKV{
+			Key:         apiPresignMaxExpiry,
+			Description: "set the longest expiry allowed for presigned URLs" + defaultHelpPostfix(apiPresignMaxExpiry),
+			Optional:    true,
+			Type:        "duration",
+		},
 	}
 )

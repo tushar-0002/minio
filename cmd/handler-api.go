@@ -57,6 +57,7 @@ type apiConfig struct {
 	rootAccess                  bool
 	syncEvents                  bool
 	objectMaxVersions           int64
+	presignMaxExpiry            time.Duration
 }
 
 const (
@@ -187,6 +188,7 @@ func (t *apiConfig) init(cfg api.Config, setDriveCounts []int, legacy bool) {
 	t.rootAccess = cfg.RootAccess
 	t.syncEvents = cfg.SyncEvents
 	t.objectMaxVersions = cfg.ObjectMaxVersions
+	t.presignMaxExpiry = cfg.PresignMaxExpiry
 
 	if t.staleUploadsCleanupInterval != cfg.StaleUploadsCleanupInterval {
 		t.staleUploadsCleanupInterval = cfg.StaleUploadsCleanupInterval
@@ -417,4 +419,12 @@ func (t *apiConfig) getObjectMaxVersions() int64 {
 	}
 
 	return t.objectMaxVersions
+}
+
+// getPresignMaxExpiry returns the longest expiry a presigned URL may have.
+func (t *apiConfig) getPresignMaxExpiry() time.Duration {
+	if t.presignMaxExpiry <= 0 {
+		return api.MaxPresignExpiry
+	}
+	return t.presignMaxExpiry
 }
