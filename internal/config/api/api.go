@@ -171,8 +171,13 @@ var (
 	}
 )
 
-// MaxPresignExpiry is the longest expiry S3 allows for a presigned URL.
-const MaxPresignExpiry = 7 * 24 * time.Hour
+const (
+	// MinPresignExpiry is the shortest expiry allowed for a presigned URL.
+	MinPresignExpiry = time.Minute
+
+	// MaxPresignExpiry is the longest expiry S3 allows for a presigned URL.
+	MaxPresignExpiry = 7 * 24 * time.Hour
+)
 
 // Config storage class configuration
 type Config struct {
@@ -354,9 +359,8 @@ func LookupConfig(kvs config.KVS) (cfg Config, err error) {
 	if err != nil {
 		return cfg, err
 	}
-	// Keep presigned URLs within what S3 clients accept.
-	if presignMaxExpiry > MaxPresignExpiry {
-		presignMaxExpiry = MaxPresignExpiry
+	if presignMaxExpiry < MinPresignExpiry || presignMaxExpiry > MaxPresignExpiry {
+		return cfg, fmt.Errorf("invalid %s %v: must be between %v and %v", apiPresignMaxExpiry, presignMaxExpiry, MinPresignExpiry, MaxPresignExpiry)
 	}
 	cfg.PresignMaxExpiry = presignMaxExpiry
 

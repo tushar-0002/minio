@@ -18,6 +18,7 @@
 package api
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -41,7 +42,8 @@ func TestLookupConfigPresignMaxExpiry(t *testing.T) {
 	}{
 		{"default", "", 168 * time.Hour},
 		{"custom", "1h", time.Hour},
-		{"above the S3 limit", "200h", 168 * time.Hour},
+		{"minimum", "1m", time.Minute},
+		{"maximum", "168h", MaxPresignExpiry},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -57,7 +59,26 @@ func TestLookupConfigPresignMaxExpiry(t *testing.T) {
 }
 
 func TestLookupConfigPresignMaxExpiryInvalid(t *testing.T) {
-	if _, err := LookupConfig(presignKVS("soon")); err == nil {
-		t.Fatal("expected an error for a value that is not a duration")
+	cases := []struct {
+		name      string
+		value     string
+		wantRange bool
+	}{
+		{"not a duration", "soon", false},
+		{"below minimum", "59s", true},
+		{"zero", "0s", true},
+		{"negative", "-1h", true},
+		{"above maximum", "200h", true},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			_, err := LookupConfig(presignKVS(c.value))
+			if err == nil {
+				t.Fatalf("expected an error for %q", c.value)
+			}
+			if c.wantRange && !strings.Contains(err.Error(), "between 1m0s and 168h0m0s") {
+				t.Fatalf("error %q does not name the allowed range", err)
+			}
+		})
 	}
 }
