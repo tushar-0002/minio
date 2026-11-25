@@ -423,6 +423,9 @@ func (t *apiConfig) getObjectMaxVersions() int64 {
 
 // getPresignMaxExpiry returns the longest expiry a presigned URL may have.
 func (t *apiConfig) getPresignMaxExpiry() time.Duration {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+
 	if t.presignMaxExpiry <= 0 {
 		return api.MaxPresignExpiry
 	}
