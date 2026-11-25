@@ -228,7 +228,7 @@ func parsePreSignV4(query url.Values, region string, stype serviceType) (psv pre
 	}
 
 	// Check the expiry against the configured limit (presign_max_expiry).
-	if preSignV4Values.Expires >= globalAPIConfig.getPresignMaxExpiry() {
+	if preSignV4Values.Expires > globalAPIConfig.getPresignMaxExpiry() {
 		return psv, ErrMaximumExpires
 	}
 
