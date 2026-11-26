@@ -23,6 +23,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/minio/minio/internal/config/api"
 )
 
 // generates credential string from its fields.
@@ -896,5 +898,31 @@ func TestParsePreSignV4(t *testing.T) {
 				t.Errorf("Test %d: Expected date to be %v, but got %v", i+1, testCase.expectedPreSignValues.Date.UTC().Format(iso8601Format), parsedPreSign.Date.UTC().Format(iso8601Format))
 			}
 		}
+	}
+}
+
+// TestParsePreSignV4ExpiresAtLimit verifies that an expiry exactly equal to
+// the maximum is accepted with the default configuration.
+func TestParsePreSignV4ExpiresAtLimit(t *testing.T) {
+	queryTime := UTCNow()
+	query := url.Values{}
+	query.Set("X-Amz-Algorithm", signV4Algorithm)
+	query.Set("X-Amz-Credential", joinWithSlash(
+		"Z7IXGOO6BZ0REAN1Q26I",
+		queryTime.Format(yyyymmdd),
+		"us-west-1",
+		"s3",
+		"aws4_request"))
+	query.Set("X-Amz-Date", queryTime.UTC().Format(iso8601Format))
+	query.Set("X-Amz-Expires", strconv.Itoa(int(api.MaxPresignExpiry/time.Second)))
+	query.Set("X-Amz-Signature", "abcd")
+	query.Set("X-Amz-SignedHeaders", "host;x-amz-content-sha256;x-amz-date")
+
+	parsed, apiErr := parsePreSignV4(query, "", serviceS3)
+	if apiErr != ErrNone {
+		t.Fatalf("expected expiry equal to the default limit (%v) to be accepted, got %v", api.MaxPresignExpiry, apiErr)
+	}
+	if parsed.Expires != api.MaxPresignExpiry {
+		t.Fatalf("expected expiry %v, got %v", api.MaxPresignExpiry, parsed.Expires)
 	}
 }

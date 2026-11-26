@@ -19,7 +19,10 @@ package cmd
 
 import (
 	"errors"
+	"net/http"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/minio/minio/internal/crypto"
 	"github.com/minio/minio/internal/hash"
@@ -68,6 +71,38 @@ func TestAPIErrCode(t *testing.T) {
 		errCode := toAPIErrorCode(ctx, testCase.err)
 		if errCode != testCase.errCode {
 			t.Errorf("Test %d: Expected error code %d, got %d", i+1, testCase.errCode, errCode)
+		}
+	}
+}
+
+// TestAPIErrorMaximumExpiresDescription verifies that the ErrMaximumExpires
+// description reflects the configured presign limit instead of the default.
+func TestAPIErrorMaximumExpiresDescription(t *testing.T) {
+	globalAPIConfig.mu.Lock()
+	old := globalAPIConfig.presignMaxExpiry
+	globalAPIConfig.presignMaxExpiry = time.Hour
+	globalAPIConfig.mu.Unlock()
+	defer func() {
+		globalAPIConfig.mu.Lock()
+		globalAPIConfig.presignMaxExpiry = old
+		globalAPIConfig.mu.Unlock()
+	}()
+
+	for _, tc := range []struct {
+		name   string
+		apiErr APIError
+	}{
+		{name: "ToAPIErr", apiErr: errorCodes.ToAPIErr(ErrMaximumExpires)},
+		{name: "getAPIError", apiErr: getAPIError(ErrMaximumExpires)},
+	} {
+		if !strings.Contains(tc.apiErr.Description, "3600 seconds") {
+			t.Errorf("%s: expected description to state the configured limit of 3600 seconds, got %q", tc.name, tc.apiErr.Description)
+		}
+		if strings.Contains(tc.apiErr.Description, "604800") {
+			t.Errorf("%s: description still reports the default limit, got %q", tc.name, tc.apiErr.Description)
+		}
+		if tc.apiErr.HTTPStatusCode != http.StatusBadRequest {
+			t.Errorf("%s: expected HTTP status code %d, got %d", tc.name, http.StatusBadRequest, tc.apiErr.HTTPStatusCode)
 		}
 	}
 }

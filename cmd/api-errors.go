@@ -456,11 +456,19 @@ const (
 
 type errorCodeMap map[APIErrorCode]APIError
 
-func (e errorCodeMap) ToAPIErrWithErr(errCode APIErrorCode, err error) APIError {
+func (e errorCodeMap) lookup(errCode APIErrorCode) APIError {
 	apiErr, ok := e[errCode]
 	if !ok {
-		apiErr = e[ErrInternalError]
+		return e[ErrInternalError]
 	}
+	if errCode == ErrMaximumExpires {
+		apiErr.Description = fmt.Sprintf("X-Amz-Expires must be at most %d seconds", int64(globalAPIConfig.getPresignMaxExpiry().Seconds()))
+	}
+	return apiErr
+}
+
+func (e errorCodeMap) ToAPIErrWithErr(errCode APIErrorCode, err error) APIError {
+	apiErr := e.lookup(errCode)
 	if err != nil {
 		apiErr.Description = fmt.Sprintf("%s (%s)", apiErr.Description, err)
 	}
@@ -1586,7 +1594,7 @@ var errorCodes = errorCodeMap{
 	},
 	ErrMaximumExpires: {
 		Code:           "AuthorizationQueryParametersError",
-		Description:    "X-Amz-Expires must be less than a week (in seconds); that is, the given X-Amz-Expires must be less than 604800 seconds",
+		Description:    "X-Amz-Expires exceeds the configured presigned URL expiry limit",
 		HTTPStatusCode: http.StatusBadRequest,
 	},
 
@@ -2614,10 +2622,7 @@ func toAPIError(ctx context.Context, err error) APIError {
 
 // getAPIError provides API Error for input API error code.
 func getAPIError(code APIErrorCode) APIError {
-	if apiErr, ok := errorCodes[code]; ok {
-		return apiErr
-	}
-	return errorCodes.ToAPIErr(ErrInternalError)
+	return errorCodes.lookup(code)
 }
 
 // getAPIErrorResponse gets in standard error and resource value and

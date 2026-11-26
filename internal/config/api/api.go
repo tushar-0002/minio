@@ -52,6 +52,7 @@ const (
 	apiRootAccess                  = "root_access"
 	apiSyncEvents                  = "sync_events"
 	apiObjectMaxVersions           = "object_max_versions"
+	apiPresignMaxExpiry            = "presign_max_expiry"
 
 	EnvAPIRequestsMax             = "MINIO_API_REQUESTS_MAX"
 	EnvAPIRequestsDeadline        = "MINIO_API_REQUESTS_DEADLINE"
@@ -76,6 +77,7 @@ const (
 	EnvAPISyncEvents                  = "MINIO_API_SYNC_EVENTS" // default "off"
 	EnvAPIObjectMaxVersions           = "MINIO_API_OBJECT_MAX_VERSIONS"
 	EnvAPIObjectMaxVersionsLegacy     = "_MINIO_OBJECT_MAX_VERSIONS"
+	EnvAPIPresignMaxExpiry            = "MINIO_API_PRESIGN_MAX_EXPIRY"
 )
 
 // Deprecated key and ENVs
@@ -162,7 +164,19 @@ var (
 			Key:   apiObjectMaxVersions,
 			Value: "9223372036854775807",
 		},
+		config.KV{
+			Key:   apiPresignMaxExpiry,
+			Value: "168h",
+		},
 	}
+)
+
+const (
+	// MinPresignExpiry is the shortest expiry allowed for a presigned URL.
+	MinPresignExpiry = time.Minute
+
+	// MaxPresignExpiry is the longest expiry S3 allows for a presigned URL.
+	MaxPresignExpiry = 7 * 24 * time.Hour
 )
 
 // Config storage class configuration
@@ -184,6 +198,7 @@ type Config struct {
 	RootAccess                  bool          `json:"root_access"`
 	SyncEvents                  bool          `json:"sync_events"`
 	ObjectMaxVersions           int64         `json:"object_max_versions"`
+	PresignMaxExpiry            time.Duration `json:"presign_max_expiry"`
 }
 
 // UnmarshalJSON - Validate SS and RRS parity when unmarshalling JSON.
@@ -339,6 +354,15 @@ func LookupConfig(kvs config.KVS) (cfg Config, err error) {
 	} else {
 		cfg.ObjectMaxVersions = math.MaxInt64
 	}
+
+	presignMaxExpiry, err := time.ParseDuration(env.Get(EnvAPIPresignMaxExpiry, kvs.GetWithDefault(apiPresignMaxExpiry, DefaultKVS)))
+	if err != nil {
+		return cfg, err
+	}
+	if presignMaxExpiry < MinPresignExpiry || presignMaxExpiry > MaxPresignExpiry {
+		return cfg, fmt.Errorf("invalid %s %v: must be between %v and %v", apiPresignMaxExpiry, presignMaxExpiry, MinPresignExpiry, MaxPresignExpiry)
+	}
+	cfg.PresignMaxExpiry = presignMaxExpiry
 
 	return cfg, nil
 }
